@@ -13,7 +13,7 @@
 "timeout-minutes": 15,
 "steps": [
 { "name": "Scarica repository", "uses": "actions/checkout@v4" },
-{ "name": "Configura Python 3.11", "uses": "actions/setup-python@v5", "with": { "python-version": "3.11" } },
+{ "name": "Configura Python 3.12", "uses": "actions/setup-python@v5", "with": { "python-version": "3.11" } },
 { "name": "Installa OddsHarvester e Chromium", "run": "pip install --upgrade pip && pip install oddsharvester && playwright install --with-deps chromium" },
 { "name": "Scarica quote campionati principali", "run": "oddsharvester upcoming -s football -l italy-serie-a,italy-serie-b,england-premier-league,spain-laliga,germany-bundesliga,france-ligue-1 -m 1x2 -f json -o raw_main.json --headless || true" },
 { "name": "Scarica quote coppe europee", "run": "oddsharvester upcoming -s football -l europe-champions-league,europe-europa-league -m 1x2 -f json -o raw_cups.json --headless || true" },
