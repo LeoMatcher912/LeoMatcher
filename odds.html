@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Matcher Pro" />
+  <title>Matcher Pro Ultimate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-app: #f4f6fb;
+      --bg-card: #ffffff;
+      --bg-input: #f1f5f9;
+      --bg-top: rgba(255, 255, 255, 0.94);
+      --border: #e2e8f0;
+      --text-title: #0f172a;
+      --text-body: #334155;
+      --text-muted: #64748b;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --red: #e11d48;
+      --red-bg: #ffe4e6;
+      --blue: #0284c7;
+      --blue-bg: #e0f2fe;
+      --amber: #d97706;
+      --amber-bg: #fef3c7;
+      --purple: #7c3aed;
+      --accent: #0f172a;
+      --accent-text: #ffffff;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+    body.dark {
+      --bg-app: #0b1120;
+      --bg-card: #131c31;
+      --bg-input: #1e293b;
+      --bg-top: rgba(11, 17, 32, 0.94);
+      --border: #26334d;
+      --text-title: #f8fafc;
+      --text-body: #cbd5e1;
+      --text-muted: #94a3b8;
+      --green: #22c55e;
+      --green-bg: rgba(34, 197, 94, 0.16);
+      --red: #fb7185;
+      --red-bg: rgba(244, 63, 94, 0.16);
+      --blue: #38bdf8;
+      --blue-bg: rgba(56, 189, 248, 0.16);
+      --amber: #fbbf24;
+      --amber-bg: rgba(251, 191, 36, 0.16);
+      --purple: #a78bfa;
+      --accent: #38bdf8;
+      --accent-text: #0b1120;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; height: 100dvh; overflow: hidden; background-color: var(--bg-app); color: var(--text-title); -webkit-font-smoothing: antialiased; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .app-container { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; background: var(--bg-app); }
+    .top-section { flex-shrink: 0; z-index: 50; background: var(--bg-top); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: max(12px, env(safe-area-inset-top)) 14px 10px; }
+
+    .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 4px; }
+    .title-wrap { display: flex; align-items: center; gap: 5px; min-width: 0; }
+    .header-title { font-size: 17px; font-weight: 900; letter-spacing: -0.5px; color: var(--text-title); white-space: nowrap; }
+    .header-title span { color: var(--blue); }
+    .count-pill { background: var(--blue-bg); color: var(--blue); font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 10px; }
+    .sync-tag { font-size: 10px; font-weight: 700; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .hdr-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+    .btn-hdr { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-title); font-size: 11px; font-weight: 800; padding: 6px 8px; border-radius: 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; }
+    .btn-hdr.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-hdr.tracker { background: var(--green-bg); color: var(--green); border-color: rgba(22, 163, 74, 0.3); }
+    .btn-hdr:disabled { opacity: 0.6; cursor: wait; }
+
+    .tabs-mode { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--bg-input); padding: 3px; border-radius: 20px; margin-bottom: 8px; border: 1px solid var(--border); }
+    .tab-m { background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 800; padding: 6px 0; border-radius: 16px; cursor: pointer; text-transform: uppercase; transition: 0.15s; }
+    .tab-m.active { background: var(--accent); color: var(--accent-text); box-shadow: var(--shadow-sm); }
+
+    .search-row { display: grid; grid-template-columns: 1fr 108px 92px; gap: 5px; margin-bottom: 6px; }
+    .num-filters-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .mini-field-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .mini-lbl { font-size: 8.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; padding-left: 2px; white-space: nowrap; }
+    .filter-field { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; height: 32px; padding: 0 6px; color: var(--text-title); font-size: 11px; font-weight: 700; outline: none; }
+    .filter-field:focus { border-color: var(--blue); }
+
+    .scroll-section { flex: 1; overflow-y: auto; scrollbar-width: none; padding: 10px 14px 42px; display: flex; flex-direction: column; gap: 10px; }
+    .scroll-section::-webkit-scrollbar { display: none; }
+
+    .bk-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      line-height: 1;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.16);
+      white-space: nowrap;
+      user-select: none;
+    }
+    .bk-logo.sm { padding: 3px 7px; font-size: 10px; border-radius: 6px; }
+    .bk-logo svg { flex-shrink: 0; }
+
+    .card { background: var(--bg-card); border-radius: 18px; padding: 13px 14px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 9px; cursor: pointer; transition: transform 0.12s ease; }
+    .card:active { transform: scale(0.985); }
+    .card-top { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: var(--text-muted); gap: 6px; }
+    .rating-wrap { display: flex; align-items: center; gap: 4px; }
+    .rating-pill { background: var(--green-bg); color: var(--green); padding: 4px 9px; border-radius: 9px; font-size: 12px; font-weight: 800; }
+    .rating-pill.mid { background: var(--amber-bg); color: var(--amber); }
+    .rating-pill.sure { background: var(--blue-bg); color: var(--blue); }
+
+    .event-title { font-size: 14px; font-weight: 800; color: var(--text-title); line-height: 1.25; }
+    .outcome-lbl { font-size: 12px; font-weight: 700; color: var(--text-body); margin-top: 2px; display: flex; align-items: center; gap: 6px; }
+    .outcome-badge { background: var(--blue-bg); color: var(--blue); font-size: 10px; font-weight: 900; padding: 1px 6px; border-radius: 6px; }
+
+    .odds-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .odd-box { border-radius: 13px; padding: 8px 9px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .odd-box.back { background: var(--blue-bg); border: 1px solid rgba(2, 132, 199, 0.25); }
+    .odd-box.lay { background: var(--red-bg); border: 1px solid rgba(225, 29, 72, 0.25); }
+    .odd-tag { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .odd-box.back .odd-tag { color: var(--blue); }
+    .odd-box.lay .odd-tag { color: var(--red); }
+    .odd-num { font-size: 18px; font-weight: 800; color: var(--text-title); line-height: 1.1; }
+    .odd-liq { font-size: 10px; font-weight: 800; color: var(--text-muted); }
+
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px); z-index: 100; align-items: flex-end; justify-content: center; }
+    .modal-backdrop.open { display: flex; }
+    .sheet { background: var(--bg-card); width: 100%; max-width: 480px; max-height: 90dvh; overflow-y: auto; border-radius: 24px 24px 0 0; padding: 16px 16px max(22px, env(safe-area-inset-bottom)); box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.2); border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 11px; }
+    .sheet-hdr { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); gap: 8px; }
+    .sheet-title { font-size: 14px; font-weight: 800; color: var(--text-title); }
+    .close-x { background: var(--bg-input); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 50%; font-weight: 800; color: var(--text-muted); cursor: pointer; flex-shrink: 0; }
+
+    .strat-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--bg-input); padding: 3px; border-radius: 12px; border: 1px solid var(--border); }
+    .strat-btn { background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; padding: 6px 0; border-radius: 9px; cursor: pointer; text-transform: uppercase; }
+    .strat-btn.active { background: var(--bg-card); color: var(--blue); box-shadow: var(--shadow-sm); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .input-group { display: flex; flex-direction: column; gap: 3px; }
+    .label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+    .field { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 11px; height: 38px; padding: 0 10px; color: var(--text-title); font-size: 15px; font-weight: 800; text-align: center; outline: none; }
+    .field:focus { border-color: var(--blue); }
+
+    .chips-row { display: flex; gap: 5px; }
+    .chip-btn { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 9px; padding: 5px 0; color: var(--text-body); font-size: 11px; font-weight: 800; cursor: pointer; }
+    .chip-btn:active { background: var(--blue); color: #fff; }
+
+    .calc-summary { background: var(--bg-app); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+    .sum-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text-body); gap: 6px; }
+    .sum-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .copy-pill { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-title); padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+    .copy-pill.lay { color: var(--red); border-color: rgba(225, 29, 72, 0.35); }
+
+    .outcome-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-top: 6px; border-top: 1px dashed var(--border); }
+    .mat-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 6px 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; }
+
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .kpi-box { border-radius: 12px; padding: 8px 5px; text-align: center; background: var(--bg-input); border: 1px solid var(--border); }
+    .kpi-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px; }
+    .kpi-val { font-size: 13px; font-weight: 800; }
+
+    .btn-save-bet { width: 100%; background: var(--green); color: #fff; border: none; border-radius: 13px; padding: 11px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); }
+    .btn-save-bet:active { transform: scale(0.98); }
+
+    .tracker-card { background: var(--bg-app); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .tracker-actions { display: flex; gap: 5px; margin-top: 4px; }
+    .t-status-btn { flex: 1; padding: 5px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; }
+    .t-status-btn.active-book { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .t-status-btn.active-ex { background: var(--green); color: #fff; border-color: var(--green); }
+    .t-status-btn.del { flex: 0 0 32px; color: var(--red); }
+
+    #toast-msg { position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-60px); background: var(--text-title); color: var(--bg-card); padding: 8px 18px; border-radius: 20px; font-weight: 800; font-size: 12px; z-index: 2000; opacity: 0; transition: all 0.25s ease; pointer-events: none; }
+    #toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div id="toast-msg">Aggiornato!</div>
+
+<div class="app-container">
+  <div class="top-section">
+    <header class="app-header">
+      <div class="title-wrap">
+        <div class="header-title">Matcher <span>Pro</span></div>
+        <span class="count-pill mono" id="matchCountPill">0</span>
+        <span class="sync-tag" id="syncTimeTag"></span>
+      </div>
+      <div class="hdr-actions">
+        <button class="btn-hdr tracker" onclick="openTracker()">📊 <span id="trackerCountBadge">0</span></button>
+        <button class="btn-hdr primary" id="refreshBtn" onclick="loadCloudFeed(true)">🔄 Aggiorna</button>
+        <button class="btn-hdr" onclick="pasteFromClipboard()" title="Incolla JSON">📋</button>
+        <button class="btn-hdr" onclick="toggleTheme()" id="themeBtn" title="Cambia Tema">🌙</button>
+      </div>
+    </header>
+
+    <div class="tabs-mode" id="modeTabs">
+      <button class="tab-m active" onclick="setMode('normale')">Norm</button>
+      <button class="tab-m" onclick="setMode('rf')">Refund</button>
+      <button class="tab-m" onclick="setMode('bonus')">Bonus</button>
+      <button class="tab-m" onclick="setMode('freebet')">Free</button>
+    </div>
+
+    <div class="search-row">
+      <input type="text" id="teamSearch" class="filter-field" placeholder="🔍 Squadra..." oninput="renderList()">
+      <select id="bookFilter" class="filter-field" onchange="renderList()">
+        <option value="ALL">Tutti i Book</option>
+      </select>
+      <select id="sortSelect" class="filter-field" onchange="renderList()">
+        <option value="RATING">Rating %</option>
+        <option value="LIQ">Liquidità €</option>
+        <option value="TIME">Orario</option>
+        <option value="ODD">Quota Max</option>
+      </select>
+    </div>
+
+    <div class="num-filters-row">
+      <div class="mini-field-wrap">
+        <span class="mini-lbl">Min Rat%</span>
+        <input type="text" inputmode="decimal" id="minRating" class="filter-field mono" value="0" oninput="renderList()">
+      </div>
+      <div class="mini-field-wrap">
+        <span class="mini-lbl">Max Rat%</span>
+        <input type="text" inputmode="decimal" id="maxRating" class="filter-field mono" value="" placeholder="∞" oninput="renderList()">
+      </div>
+      <div class="mini-field-wrap">
+        <span class="mini-lbl">Min Liq€</span>
+        <input type="text" inputmode="decimal" id="minLiq" class="filter-field mono" value="0" oninput="renderList()">
+      </div>
+      <div class="mini-field-wrap">
+        <span class="mini-lbl">Max Quota</span>
+        <input type="text" inputmode="decimal" id="maxOdd" class="filter-field mono" value="" placeholder="∞" oninput="renderList()">
+      </div>
+      <div class="mini-field-wrap">
+        <span class="mini-lbl">Comm %</span>
+        <input type="text" inputmode="decimal" id="commGlobal" class="filter-field mono" value="4.5" oninput="recalcAll()">
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-section" id="list"></div>
+</div>
+
+<!-- Calcolatore Bottom Sheet -->
+<div id="calcModal" class="modal-backdrop" onclick="if(event.target===this) closeCalc()">
+  <div class="sheet">
+    <div class="sheet-hdr">
+      <div>
+        <div class="sheet-title" id="calcTitle">Evento</div>
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-top:2px;" id="calcSub">Esito</div>
+      </div>
+      <button class="close-x" onclick="closeCalc()">✕</button>
+    </div>
+
+    <div class="strat-tabs" id="stratTabs">
+      <button class="strat-btn active" onclick="setStrategy('balanced')">Bilanciata</button>
+      <button class="strat-btn" onclick="setStrategy('underlay')">Underlay</button>
+      <button class="strat-btn" onclick="setStrategy('overlay')">Overlay</button>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label class="label">Puntata Book (€)</label>
+        <input type="text" inputmode="decimal" id="stakeInput" class="field mono" value="20" oninput="recalcModal()">
+      </div>
+      <div class="input-group">
+        <label class="label">Comm. Betfair (%)</label>
+        <input type="text" inputmode="decimal" id="commInput" class="field mono" value="4.5" oninput="recalcModal()">
+      </div>
+    </div>
+
+    <div class="chips-row">
+      <button type="button" class="chip-btn mono" onclick="setStake(10)">10€</button>
+      <button type="button" class="chip-btn mono" onclick="setStake(20)">20€</button>
+      <button type="button" class="chip-btn mono" onclick="setStake(25)">25€</button>
+      <button type="button" class="chip-btn mono" onclick="setStake(50)">50€</button>
+      <button type="button" class="chip-btn mono" onclick="setStake(100)">100€</button>
+    </div>
+
+    <div class="form-row hidden" id="rfSheetRow">
+      <div class="input-group">
+        <label class="label" style="color:var(--purple);">Rimborso (€)</label>
+        <input type="text" inputmode="decimal" id="rfAmtInput" class="field mono" value="10" oninput="recalcModal()">
+      </div>
+      <div class="input-group">
+        <label class="label" style="color:var(--purple);">Ritenzione (%)</label>
+        <input type="text" inputmode="decimal" id="rfRetInput" class="field mono" value="80" oninput="recalcModal()">
+      </div>
+    </div>
+
+    <div class="calc-summary" id="calcResults"></div>
+
+    <div class="kpi-grid">
+      <div class="kpi-box">
+        <span class="kpi-lbl">PROFITTO MEDIO</span>
+        <div id="kpiProfit" class="kpi-val mono" style="color:var(--green);">+0.00€</div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-lbl">RATING / SNR</span>
+        <div id="kpiRating" class="kpi-val mono" style="color:var(--amber);">0.00%</div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-lbl">RESPONSABILITÀ</span>
+        <div id="kpiLiab" class="kpi-val mono" style="color:var(--red);">0.00€</div>
+      </div>
+    </div>
+
+    <button class="btn-save-bet" onclick="saveCurrentBet()">💾 Salva Giocata nello Storico</button>
+  </div>
+</div>
+
+<!-- Storico Giocate Bottom Sheet -->
+<div id="trackerModal" class="modal-backdrop" onclick="if(event.target===this) closeTracker()">
+  <div class="sheet">
+    <div class="sheet-hdr">
+      <div>
+        <div class="sheet-title">Storico & Profitto</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);" id="trackerSummarySub">0 giocate salvate</div>
+      </div>
+      <button class="close-x" onclick="closeTracker()">✕</button>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-box">
+        <span class="kpi-lbl">PROFITTO REALE</span>
+        <div id="trkNetProfit" class="kpi-val mono" style="color:var(--green);">+0.00€</div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-lbl">ATTESO TOT</span>
+        <div id="trkExpProfit" class="kpi-val mono" style="color:var(--blue);">+0.00€</div>
+      </div>
+      <div class="kpi-box">
+        <span class="kpi-lbl">MOVIMENTATO</span>
+        <div id="trkVolume" class="kpi-val mono">0.00€</div>
+      </div>
+    </div>
+
+    <div id="trackerList" style="display:flex;flex-direction:column;gap:8px;max-height:50dvh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'MATCHER_PRO_GITHUB_EVENTS';
+  const TRACKER_KEY = 'MATCHER_PRO_ULTIMATE_BETS';
+  const THEME_KEY = 'MATCHER_PRO_THEME';
+  const FEED_URL = './quote.json';
+
+  let rawEvents = [];
+  let savedBets = [];
+  let flatMatches = [];
+  let filteredMatches = [];
+  let currentMode = 'normale';
+  let currentStrategy = 'balanced';
+  let selectedMatch = null;
+  let lastCalcState = null;
+
+  const BRAND_DEFS = [
+    { match: ['bet365', 'b3'], bg: '#027b5b', html: '<span style="color:#fff">bet</span><span style="color:#ffdf1b">365</span>' },
+    { match: ['sisal', 'si'], bg: '#00843d', html: '<svg width="10" height="10" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#84cc16"/></svg><span style="color:#fff">Sisal</span>' },
+    { match: ['snai', 'sn'], bg: '#ff6600', html: '<span style="color:#fff;font-style:italic">SNAI</span>' },
+    { match: ['eurobet', 'eb'], bg: '#0055a5', html: '<svg width="10" height="10" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#ffd100"/></svg><span style="color:#fff">EUROBET</span>' },
+    { match: ['goldbet', 'gb'], bg: '#0f2942', html: '<span style="color:#fff">GOLD</span><span style="color:#f59e0b">BET</span>' },
+    { match: ['lottomatica', 'lt', 'better'], bg: '#004b93', html: '<svg width="10" height="10" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" stroke="#38bdf8" stroke-width="2" fill="none"/></svg><span style="color:#fff">Lottomatica</span>' },
+    { match: ['planetwin', 'pw'], bg: '#0b1f3a', html: '<span style="color:#fff">planetwin</span><span style="color:#eab308">365</span>' },
+    { match: ['william', 'wh'], bg: '#002b5c', html: '<span style="color:#fff">William</span><span style="color:#fbbf24">HILL</span>' },
+    { match: ['betsson', 'bs'], bg: '#ff6600', html: '<span style="color:#fff;text-transform:lowercase;font-size:12px;">betsson</span>' },
+    { match: ['leovegas', 'lv'], bg: '#ff7900', html: '<svg width="10" height="10" viewBox="0 0 12 12"><circle cx="6" cy="7" r="3.5" fill="#fff"/><circle cx="3" cy="3" r="1.3" fill="#fff"/><circle cx="6" cy="2" r="1.3" fill="#fff"/><circle cx="9" cy="3" r="1.3" fill="#fff"/></svg><span style="color:#fff">LeoVegas</span>' },
+    { match: ['bwin', 'bw'], bg: '#111111', html: '<span style="color:#fff">b</span><span style="color:#ffcc00">win</span>' },
+    { match: ['888', '88'], bg: '#18181b', html: '<span style="color:#ff6600">888</span><span style="color:#fff">sport</span>' },
+    { match: ['starcasino', 'star casino', 'sc'], bg: '#111827', html: '<svg width="10" height="10" viewBox="0 0 12 12"><polygon points="6,1 7.6,4.3 11,4.8 8.5,7.2 9.1,10.7 6,9 2.9,10.7 3.5,7.2 1,4.8 4.4,4.3" fill="#ef4444"/></svg><span style="color:#fff">STARCASINÒ</span>' },
+    { match: ['admiral', 'ad'], bg: '#003366', html: '<span style="color:#fff">ADMIRAL</span><span style="color:#facc15">BET</span>' },
+    { match: ['netwin', 'nw'], bg: '#064e3b', html: '<span style="color:#fff">NET</span><span style="color:#34d399">WIN</span>' },
+    { match: ['quigioco', 'qg'], bg: '#0369a1', html: '<span style="color:#fff">QUIGIOCO</span>' },
+    { match: ['sportium', 'sp'], bg: '#b91c1c', html: '<span style="color:#fff">SPORTIUM</span>' },
+    { match: ['eplay', 'e play', 'e-play', 'ep'], bg: '#1e293b', html: '<span style="color:#fff">E-PLAY</span><span style="color:#ef4444">24</span>' },
+    { match: ['domus', 'db'], bg: '#991b1b', html: '<span style="color:#fff">DOMUS</span><span style="color:#fbbf24">BET</span>' },
+    { match: ['pokerstars', 'ps'], bg: '#111827', html: '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M6 1C3 4 1.5 6 1.5 7.5A2.5 2.5 0 0 0 5.5 9.5L5 11h2l-.5-1.5A2.5 2.5 0 0 0 10.5 7.5C10.5 6 9 4 6 1Z" fill="#ef4444"/></svg><span style="color:#fff">POKERSTARS</span>' },
+    { match: ['unibet', 'un'], bg: '#14805e', html: '<span style="color:#fff">UNIBET</span>' },
+    { match: ['betflag', 'bf'], bg: '#0284c7', html: '<span style="color:#fff">BET</span><span style="color:#fde047">FLAG</span>' },
+    { match: ['marathon', 'mb'], bg: '#0c4a6e', html: '<span style="color:#fff">MARATHON</span><span style="color:#ef4444">BET</span>' },
+    { match: ['vincitu', 'vt'], bg: '#1d4ed8', html: '<span style="color:#fff">VINCITÙ</span>' },
+    { match: ['stake', 'sk'], bg: '#1e293b', html: '<span style="color:#fff;font-style:italic">Stake</span>' },
+    { match: ['betclic', 'bc'], bg: '#d90429', html: '<span style="color:#fff">Betclic</span>' },
+    { match: ['betaland', 'ba'], bg: '#0f172a', html: '<span style="color:#fff">BETA</span><span style="color:#38bdf8">LAND</span>' },
+    { match: ['stanley', 'sb'], bg: '#991b1b', html: '<span style="color:#fff">STANLEY</span><span style="color:#fde047">BET</span>' },
+    { match: ['giochi24', 'g2'], bg: '#047857', html: '<span style="color:#fff">GIOCHI</span><span style="color:#fde047">24</span>' },
+    { match: ['giocodigitale', 'gioco digitale', 'gd'], bg: '#c2410c', html: '<span style="color:#fff">GIOCO</span><span style="color:#fde047">DIGITALE</span>' },
+    { match: ['daznbet', 'dazn bet', 'dz'], bg: '#09090b', html: '<span style="color:#fff">DAZN</span><span style="color:#a3e635">BET</span>' },
+    { match: ['signorbet', 'sg'], bg: '#1e3a8a', html: '<span style="color:#fff">SIGNOR</span><span style="color:#facc15">BET</span>' },
+    { match: ['terrybet', 'tb'], bg: '#065f46', html: '<span style="color:#fff">TERRY</span><span style="color:#34d399">BET</span>' },
+    { match: ['fantasyteam', 'ft'], bg: '#312e81', html: '<span style="color:#fff">FANTASY</span><span style="color:#38bdf8">TEAM</span>' },
+    { match: ['newgioco', 'ng'], bg: '#0369a1', html: '<span style="color:#fff">NEW</span><span style="color:#fde047">GIOCO</span>' },
+    { match: ['betn1', 'bn'], bg: '#7f1d1d', html: '<span style="color:#fff">BET</span><span style="color:#f87171">N1</span>' },
+    { match: ['pepegol', 'pg'], bg: '#15803d', html: '<span style="color:#fff">PEPE</span><span style="color:#fde047">GOL</span>' },
+    { match: ['codere', 'cd'], bg: '#006837', html: '<span style="color:#fff">codere</span>' },
+    { match: ['totosi', 'ts'], bg: '#be123c', html: '<span style="color:#fff">TOTO</span><span style="color:#fde047">SÌ</span>' },
+    { match: ['betway', 'by'], bg: '#111827', html: '<span style="color:#fff">bet</span><span style="color:#22c55e">way</span>' },
+    { match: ['novibet', 'nv'], bg: '#0f172a', html: '<span style="color:#fff">novi</span><span style="color:#38bdf8">bet</span>' },
+    { match: ['winamax', 'wx'], bg: '#991b1b', html: '<span style="color:#fff">WINA</span><span style="color:#facc15">MAX</span>' },
+    { match: ['cplay', 'cp'], bg: '#1d4ed8', html: '<span style="color:#fff">C</span><span style="color:#fde047">PLAY</span>' },
+    { match: ['plexbet', 'px'], bg: '#4c1d95', html: '<span style="color:#fff">PLEX</span><span style="color:#c4b5fd">BET</span>' },
+    { match: ['zonagioco', 'zg'], bg: '#047857', html: '<span style="color:#fff">ZONA</span><span style="color:#fde047">GIOCO</span>' },
+    { match: ['meridian', 'mr'], bg: '#b91c1c', html: '<span style="color:#fff">MERIDIAN</span><span style="color:#fde047">BET</span>' },
+    { match: ['replatz', 'rp'], bg: '#1e293b', html: '<span style="color:#fff">RE</span><span style="color:#38bdf8">PLATZ</span>' },
+    { match: ['scommettendo', 'sm'], bg: '#0c4a6e', html: '<span style="color:#fff">SCOMMETTENDO</span>' },
+    { match: ['pinnacle'], bg: '#0f172a', html: '<span style="color:#f97316">PINNACLE</span>' },
+    { match: ['betfair'], bg: '#111827', html: '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 5L6 1L10 5H7.5V11H4.5V5H2Z" fill="#ffb80c"/></svg><span style="color:#fff">betfair</span>' }
+  ];
+
+  const FALLBACK_COLORS = ['#1e293b', '#0f766e', '#1d4ed8', '#6d28d9', '#be123c', '#b45309'];
+
+  function renderBookLogo(bookName, small = false) {
+    const raw = String(bookName || 'Bookmaker').trim();
+    const low = raw.toLowerCase();
+    const cls = small ? 'bk-logo sm' : 'bk-logo';
+
+    const brand = BRAND_DEFS.find(b => b.match.some(k => k.length === 2 ? low === k : low.includes(k)));
+    if (brand) {
+      return `<span class="${cls}" style="background:${brand.bg};">${brand.html}</span>`;
+    }
+
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) hash = raw.charCodeAt(i) + ((hash << 5) - hash);
+    const bg = FALLBACK_COLORS[Math.abs(hash) % FALLBACK_COLORS.length];
+    return `<span class="${cls}" style="background:${bg};color:#fff;"><svg width="9" height="9" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="2.5" fill="rgba(255,255,255,0.28)"/></svg>${raw.toUpperCase()}</span>`;
+  }
+
+  function showToast(text) {
+    const el = document.getElementById('toast-msg');
+    el.innerText = text;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  function copyNum(val) {
+    const num = parseFloat(val).toFixed(2);
+    navigator.clipboard.writeText(num).then(() => showToast(`Copiato: € ${num}`)).catch(() => showToast(`Copiato: € ${num}`));
+  }
+
+  function parseNum(v) {
+    if (v === '' || v === null || v === undefined) return 0;
+    const n = parseFloat(String(v).replace(',', '.'));
+    return isNaN(n) ? 0 : n;
+  }
+
+  function toggleTheme() {
+    const isDark = document.body.classList.toggle('dark');
+    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+    document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙';
+  }
+
+  function init() {
+    if (localStorage.getItem(THEME_KEY) === 'dark') {
+      document.body.classList.add('dark');
+      document.getElementById('themeBtn').innerText = '☀️';
+    }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) rawEvents = JSON.parse(saved);
+      const bets = localStorage.getItem(TRACKER_KEY);
+      if (bets) savedBets = JSON.parse(bets);
+    } catch (e) {}
+
+    updateTrackerBadge();
+    recalcAll();
+    loadCloudFeed(false);
+  }
+
+  async function loadCloudFeed(manual = false) {
+    const btn = document.getElementById('refreshBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = '⏳...';
+    }
+    try {
+      const res = await fetch(`${FEED_URL}?t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Feed non ancora generato');
+      const data = await res.json();
+      const eventsList = Array.isArray(data) ? data : (data.events || data.items || []);
+      const updatedAt = data.updatedAt || Date.now();
+
+      if (eventsList.length > 0) {
+        rawEvents = [];
+        ingestPayload(eventsList, updatedAt);
+        recalcAll();
+        if (manual) showToast(`☁️ Aggiornate ${eventsList.length} partite!`);
+      } else if (manual) {
+        showToast('Nessuna nuova partita disponibile nel feed');
+      }
+    } catch (e) {
+      if (manual) showToast('Avvia prima GitHub Actions per generare quote.json');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = '🔄 Aggiorna';
+      }
+    }
+  }
+
+  async function pasteFromClipboard() {
+    try {
+      const text = await navigator.clipboard.readText();
+      const parsed = JSON.parse(text);
+      ingestPayload(parsed, Date.now());
+      recalcAll();
+      showToast('Quote importate dagli appunti!');
+    } catch (e) {
+      showToast('Nessun dato JSON valido negli appunti');
+    }
+  }
+
+  function expandCompactPayload(data, ts = Date.now()) {
+    if (data && data.v === 2 && Array.isArray(data.items)) {
+      return data.items.map(row => {
+        const evName = row[0];
+        const startIso = row[1] ? new Date(row[1] * 1000).toISOString() : null;
+        const backOdds = (row[2] || []).map(b => ({
+          event: evName,
+          outcome: b[0],
+          bookmaker: b[1],
+          backOdd: b[2]
+        }));
+        const bfRunners = (row[3] || []).map(r => ({
+          name: r[0],
+          normOutcome: r[1],
+          layOdd: r[2],
+          liquidity: r[3]
+        }));
+        return { event: evName, startTime: startIso, backOdds, bfRunners, syncedAt: ts };
+      });
+    }
+    const arr = Array.isArray(data) ? data : (data.events ? data.events : [data]);
+    return arr.map(d => ({ ...d, syncedAt: ts }));
+  }
+
+  function ingestPayload(raw, ts = Date.now()) {
+    const items = expandCompactPayload(raw, ts);
+    items.forEach(payload => {
+      if (!payload || !payload.event || !payload.backOdds || !payload.bfRunners) return;
+      rawEvents = rawEvents.filter(ev => ev.event !== payload.event);
+      rawEvents.unshift(payload);
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(rawEvents));
+  }
+
+  function setMode(m) {
+    currentMode = m;
+    const btns = document.querySelectorAll('#modeTabs .tab-m');
+    btns.forEach(b => b.classList.remove('active'));
+    const map = { normale: 0, rf: 1, bonus: 2, freebet: 3 };
+    btns[map[m]].classList.add('active');
+    document.getElementById('rfSheetRow').classList.toggle('hidden', m !== 'rf');
+    recalcAll();
+    if (selectedMatch) recalcModal();
+  }
+
+  function setStrategy(s) {
+    currentStrategy = s;
+    const btns = document.querySelectorAll('#stratTabs .strat-btn');
+    btns.forEach(b => b.classList.remove('active'));
+    const map = { balanced: 0, underlay: 1, overlay: 2 };
+    btns[map[s]].classList.add('active');
+    recalcModal();
+  }
+
+  function normalizeText(str) {
+    return str.toLowerCase()
+      .replace(/\b(fc|ac|as|us|ss|ssc|calcio|cf|cd|ud|inter milan)\b/g, m => m === 'inter milan' ? 'inter' : '')
+      .replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function normalizeOutcome(out, ev) {
+    const u = String(out).trim().toUpperCase();
+    if (u === '1' || u === 'X' || u === '2') return u;
+    if (u.includes('PAREGGIO') || u.includes('DRAW')) return 'X';
+    const parts = ev.split(/ v | vs | - /i);
+    if (parts.length === 2) {
+      const nOut = normalizeText(out);
+      if (normalizeText(parts[0]).includes(nOut) || nOut.includes(normalizeText(parts[0]))) return '1';
+      if (normalizeText(parts[1]).includes(nOut) || nOut.includes(normalizeText(parts[1]))) return '2';
+    }
+    return u;
+  }
+
+  function recalcAll() {
+    const comm = parseNum(document.getElementById('commGlobal').value) / 100;
+    flatMatches = [];
+
+    if (rawEvents.length && rawEvents[0].syncedAt) {
+      const t = new Date(rawEvents[0].syncedAt).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('syncTimeTag').innerText = `• ${t}`;
+    } else {
+      document.getElementById('syncTimeTag').innerText = '';
+    }
+
+    rawEvents.forEach(ev => {
+      ev.backOdds.forEach(item => {
+        const normOut = normalizeOutcome(item.outcome, item.event);
+        const runner = ev.bfRunners.find(r => r.normOutcome === normOut);
+        if (!runner || !runner.layOdd) return;
+
+        const B = parseFloat(item.backOdd);
+        const L = parseFloat(runner.layOdd);
+        const rating = (B / (L - (L - 1) * comm)) * 100;
+        const snr = (((B - 1) * (1 - comm)) / (L - comm)) * 100;
+
+        flatMatches.push({
+          event: ev.event,
+          startTime: ev.startTime,
+          normOutcome: normOut,
+          outcome: runner.name,
+          bookmaker: item.bookmaker,
+          backOdd: B,
+          layOdd: L,
+          liquidity: runner.liquidity,
+          rating: rating,
+          snr: snr
+        });
+      });
+    });
+
+    populateBookmakers();
+    renderList();
+  }
+
+  function populateBookmakers() {
+    const sel = document.getElementById('bookFilter');
+    const current = sel.value;
+    const books = [...new Set(flatMatches.map(m => m.bookmaker))].sort();
+    sel.innerHTML = '<option value="ALL">Tutti i Book</option>' +
+      books.map(b => `<option value="${b}">${b}</option>`).join('');
+    if (books.includes(current)) sel.value = current;
+  }
+
+  function renderList() {
+    const query = document.getElementById('teamSearch').value.trim().toLowerCase();
+    const book = document.getElementById('bookFilter').value;
+    const sortBy = document.getElementById('sortSelect').value;
+    const minRat = parseNum(document.getElementById('minRating').value);
+    const maxRatRaw = document.getElementById('maxRating').value.trim();
+    const maxRat = maxRatRaw === '' ? 9999 : parseNum(maxRatRaw);
+    const minLiq = parseNum(document.getElementById('minLiq').value);
+    const maxOddRaw = document.getElementById('maxOdd').value.trim();
+    const maxOdd = maxOddRaw === '' ? 9999 : parseNum(maxOddRaw);
+    const isFree = (currentMode === 'freebet' || currentMode === 'bonus');
+
+    filteredMatches = flatMatches.filter(m => {
+      const score = isFree ? m.snr : m.rating;
+      if (book !== 'ALL' && m.bookmaker !== book) return false;
+      if (query && !m.event.toLowerCase().includes(query) && !m.outcome.toLowerCase().includes(query)) return false;
+      if (score < minRat || score > maxRat) return false;
+      if (m.liquidity < minLiq) return false;
+      if (m.backOdd > maxOdd) return false;
+      return true;
+    });
+
+    filteredMatches.sort((a, b) => {
+      if (sortBy === 'LIQ') return b.liquidity - a.liquidity;
+      if (sortBy === 'ODD') return b.backOdd - a.backOdd;
+      if (sortBy === 'TIME') {
+        const ta = a.startTime ? new Date(a.startTime).getTime() : 9e15;
+        const tb = b.startTime ? new Date(b.startTime).getTime() : 9e15;
+        return ta - tb;
+      }
+      return isFree ? b.snr - a.snr : b.rating - a.rating;
+    });
+
+    document.getElementById('matchCountPill').innerText = filteredMatches.length;
+
+    const listEl = document.getElementById('list');
+    if (!filteredMatches.length) {
+      const msg = rawEvents.length > 0
+        ? `Ci sono <b>${rawEvents.length} partite</b> in memoria, ma nessuna rientra nei filtri impostati.`
+        : `Premi <b>🔄 Aggiorna</b> in alto per scaricare le quote aggiornate dal cloud di GitHub.`;
+      listEl.innerHTML = `
+        <div class="card" style="text-align:center;padding:28px 18px;cursor:default;">
+          <div style="font-size:14px;font-weight:800;color:var(--text-title);">Nessuna quota visualizzata</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">${msg}</div>
+        </div>`;
+      return;
+    }
+
+    listEl.innerHTML = filteredMatches.map((m, idx) => {
+      const score = isFree ? m.snr : m.rating;
+      const isSure = !isFree && score > 100;
+      const needsCheck = !isFree && score > 105;
+      const pillClass = isSure ? 'rating-pill sure' : (score >= 95 || (isFree && score >= 70) ? 'rating-pill' : 'rating-pill mid');
+      const dateStr = m.startTime ? new Date(m.startTime).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+      const liqText = m.liquidity > 0 ? `<span class="odd-liq mono">€${m.liquidity}</span>` : '';
+      return `
+        <div class="card" onclick="openCalc(${idx})">
+          <div class="card-top">
+            ${renderBookLogo(m.bookmaker)}
+            <span class="mono">${dateStr}</span>
+            <div class="rating-wrap">
+              ${needsCheck ? '<span title="Rating molto alto: verifica la quota sul book" style="font-size:12px;">⚠️</span>' : ''}
+              <span class="${pillClass} mono">${score.toFixed(2)}%</span>
+            </div>
+          </div>
+          <div>
+            <div class="event-title">${m.event}</div>
+            <div class="outcome-lbl"><span class="outcome-badge">${m.normOutcome}</span> <strong>${m.outcome}</strong></div>
+          </div>
+          <div class="odds-grid">
+            <div class="odd-box back">
+              <span class="odd-tag">Punta Book</span>
+              <span class="odd-num mono">${m.backOdd.toFixed(2)}</span>
+              ${renderBookLogo(m.bookmaker, true)}
+            </div>
+            <div class="odd-box lay">
+              <span class="odd-tag">Banca Exchange</span>
+              <span class="odd-num mono">${m.layOdd.toFixed(2)}</span>
+              <div style="display:flex;align-items:center;gap:5px;">
+                ${renderBookLogo('betfair', true)}
+                ${liqText}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openCalc(idx) {
+    selectedMatch = filteredMatches[idx];
+    if (!selectedMatch) return;
+    document.getElementById('calcTitle').innerText = selectedMatch.event;
+    document.getElementById('calcSub').innerHTML = `Esito [${selectedMatch.normOutcome}]: <b>${selectedMatch.outcome}</b>`;
+    document.getElementById('commInput').value = document.getElementById('commGlobal').value;
+    document.getElementById('rfSheetRow').classList.toggle('hidden', currentMode !== 'rf');
+    document.getElementById('calcModal').classList.add('open');
+    recalcModal();
+  }
+
+  function closeCalc() {
+    document.getElementById('calcModal').classList.remove('open');
+  }
+
+  function setStake(val) {
+    document.getElementById('stakeInput').value = val;
+    recalcModal();
+  }
+
+  function recalcModal() {
+    if (!selectedMatch) return;
+    const S = parseNum(document.getElementById('stakeInput').value);
+    const c = parseNum(document.getElementById('commInput').value) / 100;
+    const B = selectedMatch.backOdd;
+    const L = selectedMatch.layOdd;
+
+    let layStake = 0;
+    let bookWinProfit = 0;
+    let exWinProfit = 0;
+
+    if (currentMode === 'normale' || currentMode === 'bonus') {
+      const stakeCost = currentMode === 'bonus' ? 0 : S;
+      if (currentStrategy === 'underlay') {
+        layStake = L > 1 ? (S * (B - 1)) / (L - 1) : 0;
+      } else if (currentStrategy === 'overlay') {
+        layStake = (S * B) / (L - c) * 1.04;
+      } else {
+        layStake = (S * B) / (L - c);
+      }
+      const liab = layStake * (L - 1);
+      bookWinProfit = S * B - stakeCost - liab;
+      exWinProfit = layStake * (1 - c) - stakeCost;
+    } else if (currentMode === 'freebet') {
+      if (currentStrategy === 'underlay') {
+        layStake = (S * (B - 1)) / (L - c) * 0.92;
+      } else if (currentStrategy === 'overlay') {
+        layStake = (S * (B - 1)) / (L - c) * 1.08;
+      } else {
+        layStake = (S * (B - 1)) / (L - c);
+      }
+      const liab = layStake * (L - 1);
+      bookWinProfit = S * (B - 1) - liab;
+      exWinProfit = layStake * (1 - c);
+    } else if (currentMode === 'rf') {
+      const rfAmt = parseNum(document.getElementById('rfAmtInput').value);
+      const rfRet = parseNum(document.getElementById('rfRetInput').value) / 100;
+      const R = rfAmt * rfRet;
+      if (currentStrategy === 'underlay') {
+        layStake = L > 1 ? (S * (B - 1)) / (L - 1) : 0;
+      } else if (currentStrategy === 'overlay') {
+        layStake = (S * B - R) / (L - c) * 1.05;
+      } else {
+        layStake = (S * B - R) / (L - c);
+      }
+      const liab = layStake * (L - 1);
+      bookWinProfit = S * (B - 1) - liab;
+      exWinProfit = layStake * (1 - c) - S + R;
+    }
+
+    const liability = layStake * (L - 1);
+    const avgProfit = (bookWinProfit + exWinProfit) / 2;
+    const ratingPct = currentMode === 'freebet'
+      ? (S > 0 ? (avgProfit / S) * 100 : 0)
+      : (S > 0 ? ((S + avgProfit) / S) * 100 : 0);
+
+    lastCalcState = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }),
+      event: selectedMatch.event,
+      outcome: selectedMatch.outcome,
+      bookmaker: selectedMatch.bookmaker,
+      mode: currentMode,
+      stake: S,
+      backOdd: B,
+      layStake: layStake,
+      layOdd: L,
+      liability: liability,
+      bookWinProfit: bookWinProfit,
+      exWinProfit: exWinProfit,
+      expectedProfit: avgProfit,
+      status: 'pending'
+    };
+
+    document.getElementById('calcResults').innerHTML = `
+      <div class="sum-row">
+        <div class="sum-left">
+          <span>1. Punta</span>
+          ${renderBookLogo(selectedMatch.bookmaker, true)}
+          <span class="mono">@ ${B.toFixed(2)}</span>
+        </div>
+        <span class="copy-pill mono" onclick="copyNum(${S})">€ ${S.toFixed(2)}</span>
+      </div>
+      <div class="sum-row">
+        <div class="sum-left">
+          <span>2. Banca</span>
+          ${renderBookLogo('betfair', true)}
+          <span class="mono">@ ${L.toFixed(2)}</span>
+        </div>
+        <span class="copy-pill lay mono" onclick="copyNum(${layStake})">€ ${layStake.toFixed(2)}</span>
+      </div>
+      <div class="outcome-matrix">
+        <div class="mat-box">
+          <span>Vince Book</span>
+          <span class="mono" style="color:${bookWinProfit >= 0 ? 'var(--green)' : 'var(--red)'}">${bookWinProfit >= 0 ? '+' : ''}${bookWinProfit.toFixed(2)}€</span>
+        </div>
+        <div class="mat-box">
+          <span>Vince Betfair</span>
+          <span class="mono" style="color:${exWinProfit >= 0 ? 'var(--green)' : 'var(--red)'}">${exWinProfit >= 0 ? '+' : ''}${exWinProfit.toFixed(2)}€</span>
+        </div>
+      </div>
+    `;
+
+    const profEl = document.getElementById('kpiProfit');
+    profEl.innerText = `${avgProfit >= 0 ? '+' : ''}${avgProfit.toFixed(2)}€`;
+    profEl.style.color = avgProfit >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('kpiRating').innerText = `${ratingPct.toFixed(2)}%`;
+    document.getElementById('kpiLiab').innerText = `${liability.toFixed(2)}€`;
+  }
+
+  function saveCurrentBet() {
+    if (!lastCalcState) return;
+    savedBets.unshift({ ...lastCalcState });
+    localStorage.setItem(TRACKER_KEY, JSON.stringify(savedBets));
+    updateTrackerBadge();
+    closeCalc();
+    showToast('Giocata salvata nello Storico!');
+  }
+
+  function updateTrackerBadge() {
+    document.getElementById('trackerCountBadge').innerText = savedBets.length;
+  }
+
+  function openTracker() {
+    renderTracker();
+    document.getElementById('trackerModal').classList.add('open');
+  }
+
+  function closeTracker() {
+    document.getElementById('trackerModal').classList.remove('open');
+  }
+
+  function setBetStatus(id, status) {
+    const b = savedBets.find(x => x.id === id);
+    if (b) {
+      b.status = status;
+      localStorage.setItem(TRACKER_KEY, JSON.stringify(savedBets));
+      renderTracker();
+    }
+  }
+
+  function deleteBet(id) {
+    savedBets = savedBets.filter(x => x.id !== id);
+    localStorage.setItem(TRACKER_KEY, JSON.stringify(savedBets));
+    updateTrackerBadge();
+    renderTracker();
+  }
+
+  function renderTracker() {
+    let realProfit = 0;
+    let expProfit = 0;
+    let volume = 0;
+
+    savedBets.forEach(b => {
+      volume += b.stake + b.liability;
+      expProfit += b.expectedProfit;
+      if (b.status === 'book') realProfit += b.bookWinProfit;
+      else if (b.status === 'exchange') realProfit += b.exWinProfit;
+      else realProfit += b.expectedProfit;
+    });
+
+    document.getElementById('trackerSummarySub').innerText = `${savedBets.length} giocate registrate`;
+    const rpEl = document.getElementById('trkNetProfit');
+    rpEl.innerText = `${realProfit >= 0 ? '+' : ''}${realProfit.toFixed(2)}€`;
+    rpEl.style.color = realProfit >= 0 ? 'var(--green)' : 'var(--red)';
+
+    document.getElementById('trkExpProfit').innerText = `${expProfit >= 0 ? '+' : ''}${expProfit.toFixed(2)}€`;
+    document.getElementById('trkVolume').innerText = `${volume.toFixed(0)}€`;
+
+    const listEl = document.getElementById('trackerList');
+    if (!savedBets.length) {
+      listEl.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">Nessuna giocata salvata. Apri una partita e premi <b>Salva Giocata nello Storico</b>.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = savedBets.map(b => {
+      const shownProfit = b.status === 'book' ? b.bookWinProfit : (b.status === 'exchange' ? b.exWinProfit : b.expectedProfit);
+      return `
+        <div class="tracker-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            ${renderBookLogo(b.bookmaker, true)}
+            <span class="mono" style="font-size:11px;color:var(--text-muted);">${b.date} • ${b.mode.toUpperCase()}</span>
+            <span class="mono" style="font-size:12px;font-weight:800;color:${shownProfit >= 0 ? 'var(--green)' : 'var(--red)'};">${shownProfit >= 0 ? '+' : ''}${shownProfit.toFixed(2)}€</span>
+          </div>
+          <div style="font-size:12px;font-weight:800;">${b.event} — <span style="color:var(--blue);">${b.outcome}</span></div>
+          <div class="mono" style="font-size:11px;color:var(--text-muted);">Punta €${b.stake.toFixed(2)} @${b.backOdd.toFixed(2)} | Banca €${b.layStake.toFixed(2)} @${b.layOdd.toFixed(2)}</div>
+          <div class="tracker-actions">
+            <button class="t-status-btn ${b.status === 'pending' ? 'active-book' : ''}" onclick="setBetStatus(${b.id}, 'pending')">In corso</button>
+            <button class="t-status-btn ${b.status === 'book' ? 'active-ex' : ''}" onclick="setBetStatus(${b.id}, 'book')">Vinta Book</button>
+            <button class="t-status-btn ${b.status === 'exchange' ? 'active-ex' : ''}" onclick="setBetStatus(${b.id}, 'exchange')">Vinta BF</button>
+            <button class="t-status-btn del" onclick="deleteBet(${b.id})">🗑</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  init();
+</script>
+</body>
+</html>
+
